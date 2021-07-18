@@ -1,4 +1,36 @@
 #! /bin/bash
+
+### Checking for prerequisites ###
+
+#check if running as root
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 
+   exit 1
+fi
+
+#check for docker
+if ! command -v docker &> /dev/null
+then
+  echo "Docker is not installed on this host. Please install and run this script again."
+  exit 1
+fi
+
+#check for docker-compose and install if not currently
+if command -v docker-compose &> /dev/null
+then
+  echo "docker-compose is installed install will continue"
+else
+  read -p "docker-compose not detected as installed. Would you like to install it now? (y/n): " -n 1 -r 
+  echo "/n"
+  if [[ $REPLY =~ ^[yY]$ ]]
+  then
+    curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+  fi
+fi
+
+### Checking commandline strings ###
+
 if [[ $* == *--[sS][sS][Ll]* ]]
 then
     echo "Installing in HTTPS mode"
@@ -6,7 +38,7 @@ then
 else 
     echo "installing in HTTP mode"
     SSL="no"
-fi 
+fi
 
 mkdir ./nginx ./gitlab
 
@@ -116,4 +148,4 @@ networks:
     driver: bridge">docker-compose.yml
 fi
 
-echo "run 'docker-compose up -d' to start the containers"
+docker-compose up -d
