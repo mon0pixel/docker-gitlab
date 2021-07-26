@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 ### Checking for prerequisites ###
 
@@ -21,17 +21,17 @@ then
   echo "docker-compose is installed install will continue"
 else
   read -p "docker-compose not detected as installed. Would you like to install it now? (y/n): " -n 1 -r 
-  echo "/n"
+  echo
   if [[ $REPLY =~ ^[yY]$ ]]
   then
-    curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    curl -Ls "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
   fi
 fi
 
 ### Checking commandline strings ###
 
-if [[ $* == *--[sS][sS][Ll]* ]]
+if [[ $* == *--[sS][sS][lL]* ]]
 then
     echo "Installing in HTTPS mode"
     SSL="yes"
@@ -40,9 +40,9 @@ else
     SSL="no"
 fi
 
-mkdir ./nginx ./gitlab
+mkdir -p ./nginx ./gitlab
 
-if [ $SSL == "yes" ]
+if [ "$SSL" == "yes" ]
 then
     #Make folder for SSL certs which will be mounted at /tmp on the container
     mkdir ./nginx/ssl
